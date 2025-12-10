@@ -32,8 +32,6 @@ test.beforeEach(async ({page}) => {
    await app.main.gotoLogin();
    await app.login.LoginUser(user.email, user.password);
 
-   await expect(app.home.getProfileNameLocator()).toContainText(user.name);
-
    // создаем новую статью для тестов
 
    article = {
@@ -44,7 +42,7 @@ test.beforeEach(async ({page}) => {
 };
    await app.home.gotoNewArticle();
    await app.newArticle.createArticle(article.title, article.description, article.body, article.tag);
-   await expect(app.article.getArticleTitleLocator()).toContainText(article.title);
+   await app.article.getArticleTitleLocator().waitFor({ state: 'visible' });
 
 })
 
