@@ -32,6 +32,8 @@ test.beforeEach(async ({page}) => {
    await app.main.gotoLogin();
    await app.login.LoginUser(user.email, user.password);
 
+   // await expect(app.home.getProfileNameLocator()).toContainText(user.name);
+
    // создаем новую статью для тестов
 
    article = {
@@ -43,6 +45,8 @@ test.beforeEach(async ({page}) => {
    await app.home.gotoNewArticle();
    await app.newArticle.createArticle(article.title, article.description, article.body, article.tag);
    await app.article.getArticleTitleLocator().waitFor({ state: 'visible' });
+
+   // await expect(app.article.getArticleTitleLocator()).toContainText(article.title);
 
 })
 
@@ -63,11 +67,16 @@ test ('Пользователь может редактировать стать
    await expect(app.article.getArticleTitleLocator()).toContainText(articleUpdated.titleUpdated);
 })
 
-test ('Пользователь может удалить статью', async ({page}) => {
-   await app.article.deleteArticle();
-   await app.profile.expectArticleNotPresent(article.title);
+test('Пользователь может удалить статью', async ({ page }) => {
+    await app.home.gotoMyArticles();
+    await app.profile.openArticlePage(article.title);
 
-})
+    await app.article.deleteArticle();
+
+    await app.home.gotoMyArticles();
+    const deletedArticle = app.profile.articleByTitle(article.title);
+    await expect(deletedArticle).toHaveCount(0);
+});
 
 test ('Пользователь может оставить комментарий к своей статье', async ({}) => {
 
