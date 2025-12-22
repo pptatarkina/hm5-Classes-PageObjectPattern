@@ -1,5 +1,3 @@
-import { expect } from "@playwright/test";
-
 
 export class ProfilePage {
     constructor(page){
@@ -8,14 +6,13 @@ export class ProfilePage {
         this.selectedArticleTitle = this.selectedArticle.locator('h1');
         this.addToFavoriteButton = page.locator('button.btn.btn-sm.btn-outline-primary.pull-xs-right').first();
         this.favoritedArticlesSection = page.getByRole('link', {name: 'Favorited Articles'});
-
+        this.articleByTitle = (title) =>  page.locator('a.preview-link', { hasText: title });
     }
 
-   async openArticlePage(title) {
-    const articleLocator = this.page.locator('a.preview-link', { hasText: title });
-    await expect(articleLocator).toBeVisible({ timeout: 10000 });
-    await articleLocator.click();
-}
+    async openArticlePage(title) {
+    const article = this.articleByTitle(title);
+    await article.click();
+  }
 
 
     async addToFavorite() {
@@ -35,12 +32,14 @@ export class ProfilePage {
     return this.page.locator('a.preview-link', { has: this.page.locator('h1', { hasText: title }) });
 }
 
-    async expectArticleNotPresent(title) {
+    async isArticleNotPresent(title) {
     const article = this.page.getByRole('heading', {
-    level: 1,
-    name: new RegExp(title, "i")
+        level: 1,
+        name: new RegExp(title, "i")
     }).first();
 
-    await expect(article).not.toBeVisible();
+    const count = await article.count();
+    return count === 0; 
 }
+
 }
